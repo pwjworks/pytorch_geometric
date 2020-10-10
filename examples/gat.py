@@ -6,6 +6,10 @@ from torch_geometric.datasets import Planetoid
 import torch_geometric.transforms as T
 from torch_geometric.nn import GATConv
 
+from tensorboardX import SummaryWriter
+
+writer = SummaryWriter()
+
 dataset = 'Cora'
 path = osp.join(osp.dirname(osp.realpath(__file__)), '../../', 'data', dataset)
 dataset = Planetoid(path, dataset, transform=T.NormalizeFeatures())
@@ -53,4 +57,8 @@ def test():
 for epoch in range(1, 201):
     train()
     log = 'Epoch: {:03d}, Train: {:.4f}, Val: {:.4f}, Test: {:.4f}'
-    print(log.format(epoch, *test()))
+    accs = test()
+    print(log.format(epoch, *accs))
+    writer.add_scalar("Train", accs[1], epoch)
+
+writer.close()
